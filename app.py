@@ -53,21 +53,31 @@ elif option == "View All Employees":
 elif option == "Update Employee":
     st.header("Update Employee Details")
     update_id = st.text_input("Enter Employee ID to update")
-    if st.button("Search Employee to Update"):
+    
+    if update_id:
+        # Fetch the current employee details to populate input fields
         result = collection.find_one({"emp_id": update_id})
+        
         if result:
+            # Pre-fill the input fields with current employee details
             name = st.text_input("Name", value=result.get('name', ''))
             dept = st.text_input("Department", value=result.get('department', ''))
+            
             if st.button("Update Employee"):
+                # Perform the update operation
                 update_result = collection.update_one(
                     {"emp_id": update_id}, 
                     {"$set": {"name": name, "department": dept}}
                 )
-                st.write(f"Update Result: Matched Count: {update_result.matched_count}, Modified Count: {update_result.modified_count}")
-                if update_result.matched_count > 0 and update_result.modified_count > 0:
-                    st.success(f"Employee {name} updated successfully!")
+                
+                # Check the result of the update operation
+                if update_result.matched_count > 0:
+                    if update_result.modified_count > 0:
+                        st.success(f"Employee {name} updated successfully!")
+                    else:
+                        st.warning("No changes were made to the employee's details.")
                 else:
-                    st.error("Update failed. No documents matched or no modifications were made.")
+                    st.error("Update failed. No documents matched the provided Employee ID.")
         else:
             st.error("Employee not found.")
 
