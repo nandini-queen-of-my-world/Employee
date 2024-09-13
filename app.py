@@ -40,7 +40,10 @@ elif option == "Search Employee":
 
 elif option == "View All Employees":
     st.header("List of All Employees")
+    # Fetch all employee records
     employees = list(collection.find({}, {"_id": 0, "emp_id": 1, "name": 1, "department": 1}))
+    
+    # Convert to DataFrame for better display
     if employees:
         df = pd.DataFrame(employees)
         st.dataframe(df)
@@ -56,11 +59,15 @@ elif option == "Update Employee":
             name = st.text_input("Name", value=result.get('name', ''))
             dept = st.text_input("Department", value=result.get('department', ''))
             if st.button("Update Employee"):
-                result = collection.update_one({"emp_id": update_id}, {"$set": {"name": name, "department": dept}})
-                if result.matched_count > 0:
+                update_result = collection.update_one(
+                    {"emp_id": update_id}, 
+                    {"$set": {"name": name, "department": dept}}
+                )
+                st.write(f"Update Result: Matched Count: {update_result.matched_count}, Modified Count: {update_result.modified_count}")
+                if update_result.matched_count > 0 and update_result.modified_count > 0:
                     st.success(f"Employee {name} updated successfully!")
                 else:
-                    st.error("Update failed.")
+                    st.error("Update failed. No documents matched or no modifications were made.")
         else:
             st.error("Employee not found.")
 
