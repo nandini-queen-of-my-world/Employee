@@ -3,13 +3,8 @@ from pymongo import MongoClient
 import pandas as pd
 
 # Connect to MongoDB
-# Replace with your actual username and password
 connection_string = "mongodb+srv://Nandini:nandini9502@cluster0.smgpcp9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
-# Create a MongoClient instance
 client = MongoClient(connection_string)
-
-# Access the database and collection
 db = client['employee_db']
 collection = db['employees']
 
@@ -45,10 +40,7 @@ elif option == "Search Employee":
 
 elif option == "View All Employees":
     st.header("List of All Employees")
-    # Fetch all employee records
     employees = list(collection.find({}, {"_id": 0, "emp_id": 1, "name": 1, "department": 1}))
-    
-    # Convert to DataFrame for better display
     if employees:
         df = pd.DataFrame(employees)
         st.dataframe(df)
@@ -61,11 +53,14 @@ elif option == "Update Employee":
     if st.button("Search Employee to Update"):
         result = collection.find_one({"emp_id": update_id})
         if result:
-            name = st.text_input("Name", value=result['name'])
-            dept = st.text_input("Department", value=result['department'])
+            name = st.text_input("Name", value=result.get('name', ''))
+            dept = st.text_input("Department", value=result.get('department', ''))
             if st.button("Update Employee"):
-                collection.update_one({"emp_id": update_id}, {"$set": {"name": name, "department": dept}})
-                st.success(f"Employee {name} updated successfully!")
+                result = collection.update_one({"emp_id": update_id}, {"$set": {"name": name, "department": dept}})
+                if result.matched_count > 0:
+                    st.success(f"Employee {name} updated successfully!")
+                else:
+                    st.error("Update failed.")
         else:
             st.error("Employee not found.")
 
