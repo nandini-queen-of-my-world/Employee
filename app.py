@@ -3,7 +3,13 @@ from pymongo import MongoClient
 import pandas as pd
 
 # Connect to MongoDB
-client = MongoClient('mongodb://localhost:27017/')
+# Replace with your actual username and password
+connection_string = "mongodb+srv://Nandini:nandini9502@cluster0.smgpcp9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+# Create a MongoClient instance
+client = MongoClient(connection_string)
+
+# Access the database and collection
 db = client['employee_db']
 collection = db['employees']
 
